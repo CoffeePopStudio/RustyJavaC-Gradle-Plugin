@@ -13,6 +13,7 @@ class RustyJavaCPlugin : Plugin<Project> {
         )
 
         extension.command.convention(listOf("rustyjavac"))
+        extension.nativeLibPath.convention("")
         extension.javaVersion.convention(25)
         extension.mainClass.convention("")
 
@@ -39,6 +40,7 @@ class RustyJavaCPlugin : Plugin<Project> {
             val compileTask = project.tasks.register(compileTaskName, CompileRustyJavaCTask::class.java) {
                 it.sourceFiles.setFrom(sourceSet.java.srcDirs)
                 it.command.set(extension.command)
+                it.nativeLibPath.set(extension.nativeLibPath)
                 it.javaVersion.set(extension.javaVersion)
                 it.outputDir.set(classesDir)
                 it.description = "Compiles ${sourceSet.name} Java sources using RustyJavaC"

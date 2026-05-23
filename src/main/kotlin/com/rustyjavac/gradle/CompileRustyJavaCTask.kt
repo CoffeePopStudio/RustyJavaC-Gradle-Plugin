@@ -13,7 +13,7 @@ import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 
-@DisableCachingByDefault(because = "RustyJavaC is an external process, caching not applicable")
+@DisableCachingByDefault(because = "RustyJavaC relies on an external native library, caching not applicable")
 abstract class CompileRustyJavaCTask : DefaultTask() {
 
     @get:Classpath
@@ -22,6 +22,9 @@ abstract class CompileRustyJavaCTask : DefaultTask() {
 
     @get:Input
     abstract val command: ListProperty<String>
+
+    @get:Input
+    abstract val nativeLibPath: Property<String>
 
     @get:Input
     abstract val javaVersion: Property<Int>
@@ -34,7 +37,25 @@ abstract class CompileRustyJavaCTask : DefaultTask() {
         val output = outputDir.get().asFile
         output.mkdirs()
 
-        val sources = sourceFiles.files.flatMap { file ->
+        val sourcePaths = collectSources()
+        if (sourcePaths.isEmpty()) {
+            logger.lifecycle("No Java source files found, skipping RustyJavaC compilation")
+            return
+        }
+
+        val libPath = nativeLibPath.get()
+        if (libPath.isNotBlank()) {
+            compileViaNative(output, sourcePaths, libPath)
+        } else {
+            compileViaCli(output, sourcePaths)
+        }
+
+        val classFilesCount = output.walkTopDown().count { it.isFile && it.extension == "class" }
+        logger.lifecycle("RustyJavaC: compiled $classFilesCount .class file(s) to ${output.absolutePath}")
+    }
+
+    private fun collectSources(): List<String> {
+        return sourceFiles.files.flatMap { file ->
             if (file.isDirectory) {
                 file.walkTopDown().filter { it.isFile && it.extension == "java" }.toList()
             } else if (file.extension == "java") {
@@ -43,18 +64,27 @@ abstract class CompileRustyJavaCTask : DefaultTask() {
                 emptyList()
             }
         }.map { it.absolutePath }
-        if (sources.isEmpty()) {
-            logger.lifecycle("No Java source files found, skipping RustyJavaC compilation")
-            return
-        }
+    }
 
+    private fun compileViaNative(output: java.io.File, sources: List<String>, libPath: String) {
+        logger.lifecycle("RustyJavaC (FFM): compiling ${sources.size} source file(s) via $libPath")
+
+        RustyJavaCNative.load(libPath)
+        val exitCode = RustyJavaCNative.compile(sources, output.absolutePath, javaVersion.get())
+
+        if (exitCode != 0) {
+            throw GradleException("RustyJavaC compilation failed with exit code $exitCode")
+        }
+    }
+
+    private fun compileViaCli(output: java.io.File, sources: List<String>) {
         val cmd = mutableListOf<String>()
         cmd.addAll(command.get())
         cmd.add("--output-dir")
         cmd.add(output.absolutePath)
         cmd.addAll(sources)
 
-        logger.lifecycle("RustyJavaC: compiling ${sources.size} source file(s)")
+        logger.lifecycle("RustyJavaC (CLI): compiling ${sources.size} source file(s)")
         logger.info("  command: ${cmd.joinToString(" ")}")
 
         val process = ProcessBuilder(cmd)
@@ -71,8 +101,5 @@ abstract class CompileRustyJavaCTask : DefaultTask() {
         if (exitCode != 0) {
             throw GradleException("RustyJavaC compilation failed with exit code $exitCode")
         }
-
-        val classFilesCount = output.walkTopDown().count { it.isFile && it.extension == "class" }
-        logger.lifecycle("RustyJavaC: compiled $classFilesCount .class file(s) to ${output.absolutePath}")
     }
 }

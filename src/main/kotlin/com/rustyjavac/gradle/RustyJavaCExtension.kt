@@ -7,6 +7,8 @@ abstract class RustyJavaCExtension {
 
     abstract val command: ListProperty<String>
 
+    abstract val nativeLibPath: Property<String>
+
     abstract val javaVersion: Property<Int>
 
     abstract val mainClass: Property<String>
