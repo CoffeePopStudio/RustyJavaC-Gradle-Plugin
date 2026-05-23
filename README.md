@@ -30,7 +30,7 @@ plugins {
 rustyJavaC {
     command.set(listOf("rustyjavac"))  // path to the RustyJavaC binary
     mainClass.set("com.example.Main")  // optional, for executable JAR
-    javaVersion.set(21)
+    javaVersion.set(25)
 }
 ```
 
@@ -54,12 +54,12 @@ This creates `build/libs/<project-name>.jar` using only RustyJavaC for compilati
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `command` | `ListProperty<String>` | `["rustyjavac"]` | Command to invoke the RustyJavaC compiler |
-| `javaVersion` | `Property<Int>` | `21` | Target Java version |
+| `javaVersion` | `Property<Int>` | `25` | Target Java version |
 | `mainClass` | `Property<String>` | `""` | Main class for executable JAR manifest |
 
 ## Requirements
 
-- Java 17+
+- Java 25+
 - Kotlin 1.9+
 - Gradle 8+
 - [Rusty-JavaC](https://github.com/Eatgrapes/Rusty-JavaC) compiler binary accessible on `PATH`

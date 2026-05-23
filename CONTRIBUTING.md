@@ -6,7 +6,7 @@ Thanks for being interested in contributing! This plugin is part of the Rusty-Ja
 
 ### Prerequisites
 
-- **Java 17+**
+- **Java 25+**
 - **Kotlin 1.9+**
 - **Gradle 8+** (use the included wrapper: `./gradlew`)
 - **Git**

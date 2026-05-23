@@ -13,7 +13,7 @@ class RustyJavaCPlugin : Plugin<Project> {
         )
 
         extension.command.convention(listOf("rustyjavac"))
-        extension.javaVersion.convention(21)
+        extension.javaVersion.convention(25)
         extension.mainClass.convention("")
 
         project.plugins.withId("java") {
