@@ -47,7 +47,7 @@ abstract class CompileRustyJavaCTask : DefaultTask() {
         if (libPath.isNotBlank()) {
             compileViaNative(output, sourcePaths, libPath)
         } else {
-            compileViaCli(output, sourcePaths)
+            compileViaNative(output, sourcePaths, "")
         }
 
         val classFilesCount = output.walkTopDown().count { it.isFile && it.extension == "class" }
@@ -67,9 +67,16 @@ abstract class CompileRustyJavaCTask : DefaultTask() {
     }
 
     private fun compileViaNative(output: java.io.File, sources: List<String>, libPath: String) {
-        logger.lifecycle("RustyJavaC (FFM): compiling ${sources.size} source file(s) via $libPath")
+        val resolved = if (libPath.isNotBlank()) {
+            java.io.File(libPath).toPath()
+        } else {
+            val cacheRoot = project.gradle.gradleUserHomeDir.toPath().resolve("rustyjavac")
+            RustyJavaCNative.autoResolve(cacheRoot)
+        }
 
-        RustyJavaCNative.load(libPath)
+        logger.lifecycle("RustyJavaC (FFM): compiling ${sources.size} source file(s) via ${resolved.fileName}")
+
+        RustyJavaCNative.load(resolved.toString())
         val exitCode = RustyJavaCNative.compile(sources, output.absolutePath, javaVersion.get())
 
         if (exitCode != 0) {
