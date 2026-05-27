@@ -1,8 +1,4 @@
 # RustyJavaC Gradle Plugin
-
-> [!WARNING]
-> This project is still under heavy development. RustyJavaC itself is not yet a complete Java compiler.
-
 Gradle plugin that integrates [Rusty-JavaC](https://github.com/Eatgrapes/Rusty-JavaC) (a Rust-based Java compiler) into your Gradle build. It compiles Java sources using the RustyJavaC CLI and assembles the resulting `.class` files into JARs.
 
 ## Features
