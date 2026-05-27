@@ -7,8 +7,8 @@ Thanks for being interested in contributing! This plugin is part of the Rusty-Ja
 ### Prerequisites
 
 - **Java 25+**
-- **Kotlin 1.9+**
-- **Gradle 8+** (use the included wrapper: `./gradlew`)
+- **Kotlin 2.3+**
+- **Gradle 9+** (use the included wrapper: `./gradlew`)
 - **Git**
 
 ### Building
@@ -40,24 +40,6 @@ This compiles the demo Java sources with RustyJavaC and produces a JAR. To run i
 ```bash
 java -jar demo/build/libs/rustyjavac-demo.jar
 ```
-
-## Project Structure
-
-```
-├── build.gradle.kts          # Plugin build configuration
-├── settings.gradle.kts
-├── gradle/wrapper/           # Gradle wrapper files
-├── src/main/kotlin/
-│   └── com/rustyjavac/gradle/
-│       ├── RustyJavaCPlugin.kt      # Plugin: registers tasks when 'java' plugin is applied
-│       ├── RustyJavaCExtension.kt   # DSL extension: command, javaVersion, mainClass
-│       └── CompileRustyJavaCTask.kt # Task: invokes RustyJavaC CLI, writes .class files
-├── demo/                     # Demo project consuming the plugin
-│   ├── build.gradle.kts
-│   └── src/main/java/...     # Sample Java source files
-└── gradlew / gradlew.bat
-```
-
 ## Development Workflow
 
 1. **Fork and clone** the repo.
@@ -107,8 +89,6 @@ fix(task): handle empty source directories
 refactor(extension): use ListProperty for command
 chore: remove demo wrapper, use root wrapper instead
 ```
-
-## License
 
 By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE), same as the rest of the project.
 
